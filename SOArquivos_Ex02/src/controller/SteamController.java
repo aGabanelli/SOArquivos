@@ -1,11 +1,6 @@
 package controller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class SteamController {
 
@@ -15,12 +10,11 @@ public class SteamController {
 		File arq = new File(diretorio, arquivo);
 		if(arq.exists()) {
 			try {
-				StringBuffer sb = new StringBuffer();
 				FileInputStream fis = new FileInputStream(arq);
 				InputStreamReader isr = new InputStreamReader(fis);
 				BufferedReader br = new BufferedReader(isr);
 				String linha = br.readLine();
-				System.out.println("Nome do jogo \t\t\t | Média de jogadores ativos \t %");
+				System.out.println("Nome do jogo \t\t\t\t\t | Média de jogadores ativos");
 				linha = br.readLine();
 				while(linha != null) {
 					String[] vetLinha = linha.split(",");
@@ -28,13 +22,13 @@ public class SteamController {
 					String anoCSV = vetLinha[1];
 					String mesCSV = vetLinha[2];
 					if(mediaDeJogadoresCSV >= mediaDeJogadores && anoCSV.equals(ano) && mesCSV.equals(mes)) {
-						for(int i = 0 ; i < 7 ; i += 3) {
+						for(int i = 0 ; i < 5 ; i += 3) {
 							if (vetLinha[i].length() > 20) {
-					            System.out.print(vetLinha[i] + "\t");
-					        } else if (vetLinha[i].length() > 15) {
 					            System.out.print(vetLinha[i] + "\t\t");
-					        } else {
+					        } else if (vetLinha[i].length() > 15) {
 					            System.out.print(vetLinha[i] + "\t\t\t");
+					        } else {
+					            System.out.print(vetLinha[i] + "\t\t\t\t\t");
 					        }
 						}
 						System.out.println("\n");
@@ -46,7 +40,6 @@ public class SteamController {
 				fis.close();
 				isr.close();
 				br.close();
-				System.out.println(sb.toString());
 //				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -58,7 +51,48 @@ public class SteamController {
 		}
 	}
 	
-	public void gerarArquivo() {
+	public void gerarArquivo(String ano, String mes, String diretorio, String nomeDoArquivo) throws IOException {
+		File newDir = new File(diretorio);
+		File arq = new File(newDir, nomeDoArquivo);
+		
+		String diretorioDados = "C:\\TEMP\\";
+		String arquivoDados = "SteamCharts.csv";
+		File arqDados = new File(diretorioDados, arquivoDados);
+		
+		if(!arq.exists()) {
+			try {
+				arq.createNewFile();
+				System.out.println("Arquivo Gerado!");
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		try {
+			FileWriter fw = new FileWriter(arq);
+			PrintWriter pw = new PrintWriter(fw);
+			FileInputStream fis = new FileInputStream(arqDados);
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader br = new BufferedReader(isr);
+			String linha = br.readLine();
+			pw.println("Nome do jogo;Media dos jogadores ativos");
+			while(linha != null) {
+				String[] vetLinha = linha.split(",");
+				String anoCSV = vetLinha[1];
+				String mesCSV = vetLinha[2];
+				if(anoCSV.equals(ano) && mesCSV.equals(mes)) {
+					pw.println(vetLinha[0] + ";" + vetLinha[3]);
+				}
+				linha = br.readLine();
+			}
+			pw.close();
+			fis.close();
+			isr.close();
+			br.close();
+			System.out.println("Arquivo pronto com dados completos!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
